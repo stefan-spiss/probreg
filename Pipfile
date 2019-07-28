@@ -11,9 +11,11 @@ transformations = "*"
 scipy = "*"
 scikit-learn = "==0.20.3"
 matplotlib = "*"
+"dq3d" = "*"
 
 [dev-packages]
 sphinx = "*"
+twine = "*"
 "flake8" = "*"
 sphinx-rtd-theme = "*"
 
