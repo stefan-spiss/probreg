@@ -13,3 +13,5 @@ work
 linux-64
 git_cache
 noarch
+.venv/
+venv/
