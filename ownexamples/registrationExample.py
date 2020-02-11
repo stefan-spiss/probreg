@@ -15,6 +15,12 @@ def register_cpd(source, target):
     result.points = tf_param.transform(result.points)
     return result, tf_param
 
+def register_gmmreg(source, target):
+    tf_param = l2dist_regs.registration_gmmreg(source, target)
+    result = copy.deepcopy(source)
+    result.points = tf_param.transform(result.points)
+    return result, tf_param
+
 def register_svr(source, target):
     tf_param = l2dist_regs.registration_svr(source, target)
     result = copy.deepcopy(source)
@@ -90,7 +96,7 @@ def fast_global_registration(source, target, voxel_size):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test different point cloud registration algorithms.')
-    parser.add_argument('--method', default='cpd', choices=['cpd', 'svr', 'gmmtree', 'filterreg', 'filterreg_feature', 'icp'], help='Method to be used for point cloud registration.')
+    parser.add_argument('--method', default='cpd', choices=['cpd', 'gmmreg', 'svr', 'gmmtree', 'filterreg', 'filterreg_feature', 'icp'], help='Method to be used for point cloud registration.')
     parser.add_argument('--voxel_size', type=float, default=5, help='Voxel size of downsampled point clouds. A value <= 0.0 indicates that no downsampling is used.')
     parser.add_argument('--source_file', help='File containing source model, if --source_is_mesh argument is not set, it is assumed to be a mesh.')
     parser.add_argument('--source_is_mesh', type=bool, default=True, choices=[True, False], help='If false, source model is loaded as point cloud, otherwise as mesh. Default is True.')
@@ -108,7 +114,9 @@ if __name__ == '__main__':
         source_file = command_line_args.source_file
         source_is_mesh = command_line_args.source_is_mesh
     if command_line_args.target_file is None:
-        target_file = '/media/Data/Masterthesis/Insta360ProVideos/EnvironmentTwoUniPCBoxesObjectTracking/PointClouds/EnvironmentTwoUniPCBoxesObjectTracking_Lens23_Elas_CropedToBunny.ply'
+        # target_file = '/media/Data/Masterthesis/Insta360ProVideos/EnvironmentTwoUniPCBoxesObjectTracking/PointClouds/EnvironmentTwoUniPCBoxesObjectTracking_Lens23_Elas_CropedToBunny.ply'
+        target_file = '/media/Data/Masterthesis/Insta360ProVideos/EnvironmentTwoUniPCBoxesObjectTracking/PointClouds/EnvironmentTwoUniPCBoxesObjectTracking_Lens23_Elas_CropedToBunny_ColorFilter_Rgeq100_Gseq85_Bseq100.ply'
+
         target_is_mesh = False
     else:
         target_file = command_line_args.target_file
@@ -172,6 +180,10 @@ if __name__ == '__main__':
         print(':: Register models with cpd.')
         result, tf_param = register_cpd(source, target)
 
+    elif command_line_args.method == 'gmmreg':
+        print(':: Register models with gmmreg.')
+        result, tf_param = register_gmmreg(source, target)
+
     elif command_line_args.method == 'svr':
         print(':: Register models with svr.')
         result, tf_param = register_svr(source, target)
@@ -193,7 +205,7 @@ if __name__ == '__main__':
         result, tf_param = register_filterreg_feature(source, target)
 
     elif command_line_args.method == 'icp':
-        print(':: Register models with filterreg_feature.')
+        print(':: Register models with icp.')
         result, tf_param = register_icp(source, target, voxel_size)
 
     if result is not None:
